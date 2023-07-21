@@ -6,8 +6,10 @@ from zeep.wsse.username import UsernameToken
 from zeep.plugins import HistoryPlugin
 from zeep.helpers import serialize_object
 import zeep
+import datetime
 
-SAMSARA_TOKEN = ""
+
+#  SAMSARA_TOKEN = ""
 
 class WSDLSetUp:
 
@@ -52,8 +54,7 @@ class RESTSetUp:
     def get_base_url(self, url):
         urls = {
             "hos_clocks": "https://api.samsara.com/fleet/hos/clocks",
-            "hos_daily_logs": "https://api.samsara.com/fleet/hos/daily-logs?startDate=2023-07-20&endDate=2023-07-20",
-            # "hos_daily_logs": "https://api.samsara.com/fleet/hos/daily-logs"
+            "hos_daily_logs": "https://api.samsara.com/fleet/hos/daily-logs?driverIds=1396287&startDate=2023-07-20&endDate=2023-07-20", # HARDCODED
         }
         return urls[url]
 
@@ -68,7 +69,7 @@ class RESTSetUp:
 
         response = requests.get(url, headers=headers)
         json_response = response.json()
-        df = pd.DataFrame(json_response["data"])
+        df = pd.json_normalize(json_response['data'])
         return df    
 
 
@@ -90,7 +91,7 @@ class TruckMate:
 
     def send_driver_hos_daily_hours(self):
         #dirver id: 1396287
-        response = self.client.service.SendDriverHOSDailyHours(DriverId="BILLAV", HOSDate="2023-07-20Z", OffDutyHours=40, SleeperHours=38, OnDutyHours=47, DrivingHours=77, _soapheaders=self.headers)
+        response = self.client.service.SendDriverHOSDailyHours(DriverId="BILLAV", HOSDate="2023-07-21Z", OffDutyHours=40, SleeperHours=38, OnDutyHours=47, DrivingHours=77, _soapheaders=self.headers)
         print(response)
 
 class Samsara:
@@ -118,12 +119,19 @@ class Samsara:
     def get_hos_signin_out():
         pass
 
+class TransformationLayer:
+    def __init__(self) -> None:
+        pass
+
+    def ms_to_hours(self, ms):
+        return ms / 3600000.0
 
 class IntegrationLater:
 
     def __init__(self, samsara, truck_mate):
         self.samsara = samsara
         self.truck_mate = truck_mate
+        self.transform = TransformationLayer()
 
     def hours_of_service(self):
         self.samsara.get_hos_clocks()
@@ -131,7 +139,13 @@ class IntegrationLater:
 
     def driver_hos_daily_hours(self):
         df = self.samsara.get_driver_hos_daily_hours(1,2)
+
         print(df.head())
+        # duration_cols = df['dutyStatusDurations'][0].keys()
+        
+        # df[duration_cols] = df[duration_cols].apply(self.transform.ms_to_hours)
+
+        # print(df[duration_cols].head())
         self.truck_mate.send_driver_hos_daily_hours()
 
 
