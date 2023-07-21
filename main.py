@@ -36,7 +36,7 @@ class WSDLSetUp:
         mobile_comm_header_name = '{%s}TMobileCommHeader' % mobile_comm_namespace
         mobile_comm_header = client.get_element(mobile_comm_header_name)
         mobile_comm_soap_header = mobile_comm_header(
-            NetworkID=""
+            NetworkID="https://vie.portal.tmwcloud.com/"
         )
 
         headers = [soap_header, mobile_comm_soap_header]
@@ -90,8 +90,8 @@ class TruckMate:
 
     def send_driver_hos_daily_hours(self):
         #dirver id: 1396287
-        self.client.service.SendDriverHOSDailyHours(DriverId="BILLAV", HOSDate="2023-07-20Z", OffDutyHours=40, SleeperHours=38, OnDutyHours=47, DrivingHours=77, _soapheaders=self.headers)
-
+        response = self.client.service.SendDriverHOSDailyHours(DriverId="BILLAV", HOSDate="2023-07-20Z", OffDutyHours=40, SleeperHours=38, OnDutyHours=47, DrivingHours=77, _soapheaders=self.headers)
+        print(response)
 
 class Samsara:
 
