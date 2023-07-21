@@ -53,7 +53,7 @@ class RESTSetUp:
 
     def get_base_url(self, url):
         urls = {
-            "hos_clocks": "https://api.samsara.com/fleet/hos/clocks",
+            "hos_clocks": "https://api.samsara.com/fleet/hos/clocks", #IGNORE
             "hos_daily_logs": "https://api.samsara.com/fleet/hos/daily-logs?driverIds=1396287&startDate=2023-07-20&endDate=2023-07-20", # HARDCODED
         }
         return urls[url]
@@ -133,9 +133,9 @@ class IntegrationLater:
         self.truck_mate = truck_mate
         self.transform = TransformationLayer()
 
-    def hours_of_service(self):
-        self.samsara.get_hos_clocks()
-        print(self.truck_mate.get_active_trips(100))
+    # def hours_of_service(self):
+    #     self.samsara.get_hos_clocks()
+    #     print(self.truck_mate.get_active_trips(100))
 
     def driver_hos_daily_hours(self):
         df = self.samsara.get_driver_hos_daily_hours(1,2)
